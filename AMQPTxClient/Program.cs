@@ -1,8 +1,10 @@
 ﻿using System.Diagnostics;
 using System.Text;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Exceptions;
 
-const string hostName = "localhost";
+// const string hostName = "localhost";
+const string hostName = "shostakovich";
 
 var cts = new CancellationTokenSource();
 
@@ -59,18 +61,29 @@ for (int i = 0; i < 3; i++)
         taskCf.Endpoint = taskEp;
         Console.WriteLine("[INFO] opening connection to {0}", taskEp.ToString());
         string queueName = $"vesc-1073-{i}";
-        using (var conn = taskCf.CreateConnection())
+        try
         {
-            using (var ch = conn.CreateModel())
+            using (var conn = taskCf.CreateConnection())
             {
-                ch.TxSelect();
-                while (!cts.IsCancellationRequested)
+                using (var ch = conn.CreateModel())
                 {
-                    ch.BasicPublish(exchange: exchangeName, routingKey: routingKey, mandatory: true, body: Encoding.ASCII.GetBytes(i.ToString()));
-                    ch.TxCommit();
-                    await Task.Delay(TimeSpan.FromSeconds(1));
+                    ch.TxSelect();
+                    while (!cts.IsCancellationRequested)
+                    {
+                        ch.BasicPublish(exchange: exchangeName, routingKey: routingKey, mandatory: true, body: Encoding.ASCII.GetBytes(i.ToString()));
+                        ch.TxCommit();
+                        await Task.Delay(TimeSpan.FromSeconds(1));
+                    }
                 }
             }
+        }
+        catch (OperationInterruptedException ex)
+        {
+            Console.Error.WriteLine("[ERROR] operation interrupted exception: {0}", ex.ToString());
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine("[ERROR] exception: {0}", ex.ToString());
         }
     };
 
