@@ -18,7 +18,8 @@ Do
     $deleted=$false
     $port = 15672 + $portIdx
     $baseAddress = "http://shostakovich:$port/api/queues"
-    $request="${baseAddress}?page=${page}&page_size=${pageSize}&name=${nameFilter}&use_regex=false&pagination=true"
+    # $request="${baseAddress}?page=${page}&page_size=${pageSize}&name=${nameFilter}&use_regex=false&pagination=true"
+    $request="${baseAddress}?page=${page}&page_size=${pageSize}&pagination=true"
     Write-Host "[INFO] request: $request"
     try
     {
@@ -31,6 +32,8 @@ Do
         $finished=$true
     }
     $data = $result | ConvertFrom-Json
+    Write-Host "[INFO] request data: " $data
+    Write-Host "[INFO] request data.items[0]: " $data.items[0]
  
     $page++
 

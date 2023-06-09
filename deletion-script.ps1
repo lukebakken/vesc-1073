@@ -21,7 +21,6 @@ DO {
     $request="${baseAddress}?page=${page}&page_size=${pageSize}&name=${nameFilter}&use_regex=false&pagination=true"
     Write-Host "[INFO] Get queues: " $request
     try {
-        # $result = Invoke-WebRequest -Method Get -Headers $Headers -URI $request -Verbose
         $result = Invoke-WebRequest -Method Get -Headers $Headers -URI $request
     } catch {
         Write-Host $Error[0]
