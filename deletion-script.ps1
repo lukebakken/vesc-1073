@@ -19,7 +19,7 @@ DO {
     $port = 15672
     $baseAddress = "http://shostakovich:$port/api/queues"
     $request="${baseAddress}?page=${page}&page_size=${pageSize}&name=${nameFilter}&use_regex=false&pagination=true"
-    # Write-Host "Get queues: " $request
+    Write-Host "[INFO] Get queues: " $request
     try {
         # $result = Invoke-WebRequest -Method Get -Headers $Headers -URI $request -Verbose
         $result = Invoke-WebRequest -Method Get -Headers $Headers -URI $request
@@ -29,6 +29,7 @@ DO {
         $finished=$true
     }
     $data = $result | ConvertFrom-Json
+    Write-Host '[INFO] Get queues - DONE'
  
     $origProgressPreference = $ProgressPreference
     try
@@ -37,6 +38,7 @@ DO {
         {
             ## if ($item.consumers -eq 0 -And $item.messages -eq 0)
             ## {
+                Write-Host "[INFO] Deleting queue: " $item.name
                 $escapedName = $item.name -replace ":","%3A"
                 $escapedName = $escapedName -replace "/","%2F"
                 $escapedName = $escapedName -replace " ","%20"
@@ -49,8 +51,8 @@ DO {
                     Write-Warning "Failed to delete queue ${item.name}" $Error[0]
                     continue
                 }
-                Write-Host "Deleted queue: " $item.name
-                Write-Host "Total deleted queues: " $totalDeleted
+                Write-Host "[INFO] Deleted queue: " $item.name
+                Write-Host "[INFO] Total deleted queues: " $totalDeleted
                 $totalDeleted++
                 $deleted = $true
             ## }
